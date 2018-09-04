@@ -1,87 +1,31 @@
 #%RAML 1.0
-baseUri: https://mocksvc.mulesoft.com/mocks/94dd7cc0-ab24-4aa7-823b-dd94edb7ac81 # 
 title: Sales API
 
 version: v1
-mediaType: [application/json]
 
 description: This API spec is designed to accept Opportunities and OpportunityLineItems to create Orders
 
-types:
-  opportunityLineItem:
-    type: object
-    properties: 
-      ProductCode:
-        type: string
-      Quantity:
-        type: number
-    example: |
-      {
-        "ProductCode": "ABC001",
-        "Quantity": 23.0
-      }
-  opportunity: 
-    type: object
-    properties: 
-      OpportunityID:
-        type: string
-        example: "xxxxxx"
-      CustomerID:
-        type: string
-        example: "xxxxxx"
-      OpportunityLineItems:
-        type: array
-        items: opportunityLineItem
-  orderCreatedResponse:
-    type: object
-    properties:
-      resultCode:
-        type: string
-        example: "200"
-      message:
-        type: string
-        example: "all good"
-      OrderId:
-        type: string
-        example: "xx-0012-ss"
-      CustomerID:
-        type: string
-        example: "xxxxx"
-      OpportunityID:
-        type: string
-        example: "xxxxx"
+
+mediaType: [application/json, application/xml]
+securedBy: [passthrough]
+
+securitySchemes: 
+  passthrough: !include /exchange_modules/5dfb47dc-12e3-4cac-afc5-a00be32d15d8/pass-through-security-scheme/1.0.0/pass-through-security-scheme.raml
+
+uses:
+  sales-orders: /exchange_modules/66234019-5a31-4239-ba28-4e6d70f0468a/sales-orders-library/1.0.5/sales-orders-types.raml
 
 /order:
   post:
-    description: Creates a new order
-    body: 
+    body:
       application/json:
-        type: opportunity
-        example: |
-          {
-            "OpportunityID": "xxxxxx",
-            "CustomerID": "xxxxxx",
-            "OpportunityLineItems": [
-              {
-                "ProductCode": "ABC001",
-                "Quantity": 23.0
-              },
-              {
-                "ProductCode": "DEF001",
-                "Quantity": 15.0
-              }
-            ]
-          }
+        type: sales-orders.SalesOpportunity
     responses: 
-      200:
-        body: 
+      201:
+        body:
           application/json:
-            type: orderCreatedResponse
-            example: |
-              {
-                "resultCode": "0",
-                "message": "all good",
-                "OrderId": "12312312312",
-                "CustomerID": "xxxxxx",
-                "OpportunityID": "xxxxxx"
-              }
+            type: sales-orders.SalesOrderResponse 
+      500:
+        body:
+          application/json:
+            type: sales-orders.SalesOrderResponse  
