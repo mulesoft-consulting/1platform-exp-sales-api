@@ -9,7 +9,10 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
     <apikit:config name="sales-api-config" raml="sales-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     
     <order-fulfillment-api:config name="Order_Fulfillment_API_Config" doc:name="Order Fulfillment API Config" 
-    	doc:id="5fe39f7d-4017-44e9-adb8-be4bcb654948" />
+    	doc:id="5fe39f7d-4017-44e9-adb8-be4bcb654948" 
+    		property_protocol="${orderfulfillment-api.protocol}" 
+    		property_client-id="${orderfulfillment-api.client_id}" 
+    		property_client-secret="${orderfulfillment-api.client_secret}" property_host="${orderfulfillment-api.host}" property_port="${orderfulfillment-api.port}" property_basePath="${orderfulfillment-api.basePath}"/>
 	
 	<api-gateway:autodiscovery apiId="${api.id}" doc:name="API Autodiscovery" doc:id="25ef3dd1-ab4f-4096-ba30-e19677ab8d5e" flowRef="sales-api-main" />
 	
@@ -136,6 +139,7 @@ output application/json
     </flow>
     <flow name="post:\order:application\json:sales-api-config">
 		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="79f116bb-5303-498d-bc5f-2e58128142fb" variableName="OrderInfo"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6adb199f-578f-45c5-b0ad-1dd8de199799" message="received order request #[output application/json ---payload]" />
 		<ee:transform doc:name="Transform Message" doc:id="f7195632-a4aa-4d9f-99d5-dc1ba7b5c9fc" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -143,33 +147,44 @@ output application/json
 ---
 [
 	{
-	shippingCost: payload.shippingCost,
-	subTotal: payload.subTotal,
+	shippingCost: (payload.shippingCost default 0),
+	sourceSystem: payload.sourceSystem,
+	payments: [],
+	subTotal: (payload.subTotal default 0),
 	orderItems: payload.OpportunityLineItems map ( opportunityLineItem , indexOfOpportunityLineItem ) -> {
 		product: {
-			id: opportunityLineItem.ProductCode
+			id: opportunityLineItem.productCode default ""
 		},
 		quantity: {
-			ordered: opportunityLineItem.quantity
+			ordered: round(opportunityLineItem.quantity as Number)
 		},
-		sourceSystem: opportunityLineItem.sourceSystem,
+		sourceSystem: payload.sourceSystem,
 		orderLine: opportunityLineItem.opportunityLine,
+		location: {
+			id: "0",
+			"type": "no type"
+		},
 		pricing: {
 			totalAmount: opportunityLineItem.pricing.totalAmount,
 			itemAmount: opportunityLineItem.pricing.itemAmount,
-			discountPct: opportunityLineItem.pricing.discountPct
+			discountPct: 0.0
 		}
 	},
-	totalAmount: payload.totalAmount,
+	totalAmount: (payload.totalAmount default 0),
 	customerId: payload.CustomerID,
-	taxAmount: payload.taxAmount
+	currency: {
+		code: "USD"
+	},
+	taxAmount: (payload.taxAmount default 0)
 }
 ]
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="creating order request" doc:id="4101b67d-4a2c-4913-bc79-42159ca8b47e" message="creating order request #[output application/json ---payload]" />
 		<order-fulfillment-api:post-orders doc:name="Post orders"
 			 doc:id="4342117e-76ad-4353-836d-0fb6c7ba647e" config-ref="Order_Fulfillment_API_Config"/>
+		<logger level="INFO" doc:name="order fulfillment response" doc:id="3ce9a751-6fc1-443d-a739-1e44ef644eb7" message="order fulfillment response #[output application/json ---payload]" />
 		<ee:transform doc:name="Transform Message" doc:id="bafe61ce-1461-4fb2-a432-5743290e8fd5" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
