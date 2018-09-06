@@ -192,8 +192,8 @@ output application/json
 ---
 {
 	metadata: {
-		creationResult: "Created",
-		message: "All Right"
+		creationResult: if (payload.messages.code contains "201" ) "Created" else "Error",
+		message: (payload.messages.description default "")
 	},
 	response: {
 		OpportunityId: vars.OrderInfo.Id,
@@ -203,5 +203,6 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="api response" doc:id="f20ea3f9-40f7-4885-9a52-795e64fa0af7" message="sales api response #[output application/json ---payload]" />
     </flow>
 </mule>
