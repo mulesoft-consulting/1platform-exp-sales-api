@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:order-fulfillment-api="http://www.mulesoft.org/schema/mule/order-fulfillment-api" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/order-fulfillment-api http://www.mulesoft.org/schema/mule/order-fulfillment-api/current/mule-order-fulfillment-api.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+    <http:listener-config name="sales-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="sales-api-config" raml="sales-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    
+    <order-fulfillment-api:config name="Order_Fulfillment_API_Config" doc:name="Order Fulfillment API Config" 
+    	doc:id="6ee7fc2c-4173-4447-b7ca-eacdcaf84d45" 
+    		property_protocol="${orderfulfillment-api.protocol}" 
+    		property_client-id="${orderfulfillment-api.client_id}" 
+    		property_client-secret="${orderfulfillment-api.client_secret}" property_host="${orderfulfillment-api.host}" property_port="${orderfulfillment-api.port}" property_basePath="${orderfulfillment-api.basePath}"/>
+	
+	<api-gateway:autodiscovery apiId="${api.id}" doc:name="API Autodiscovery" doc:id="de2792ea-de74-4029-87fb-dcf3f1027e97" flowRef="sales-api-main" />
+	
+	<configuration-properties doc:name="Configuration properties" doc:id="77429ce3-5f4a-4ba0-95bd-ff69d32c15a7" file="config/configuration.yaml" />
+		
+</mule>

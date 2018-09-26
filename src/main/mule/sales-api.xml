@@ -3,21 +3,7 @@
 http://www.mulesoft.org/schema/mule/order-fulfillment-api http://www.mulesoft.org/schema/mule/order-fulfillment-api/current/mule-order-fulfillment-api.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
-    <http:listener-config name="sales-api-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" />
-    </http:listener-config>
-    <apikit:config name="sales-api-config" raml="sales-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    
-    <order-fulfillment-api:config name="Order_Fulfillment_API_Config" doc:name="Order Fulfillment API Config" 
-    	doc:id="5fe39f7d-4017-44e9-adb8-be4bcb654948" 
-    		property_protocol="${orderfulfillment-api.protocol}" 
-    		property_client-id="${orderfulfillment-api.client_id}" 
-    		property_client-secret="${orderfulfillment-api.client_secret}" property_host="${orderfulfillment-api.host}" property_port="${orderfulfillment-api.port}" property_basePath="${orderfulfillment-api.basePath}"/>
-	
-	<api-gateway:autodiscovery apiId="${api.id}" doc:name="API Autodiscovery" doc:id="25ef3dd1-ab4f-4096-ba30-e19677ab8d5e" flowRef="sales-api-main" />
-	
-	<configuration-properties doc:name="Configuration properties" doc:id="1015f7ed-0475-4db1-ac83-80a459a6de38" file="mule-app.properties" />
-	<flow name="sales-api-main">
+    <flow name="sales-api-main">
         <http:listener config-ref="sales-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>

@@ -1,0 +1,125 @@
+#%RAML 1.0 Library
+uses: 
+  address: /exchange_modules/5dfb47dc-12e3-4cac-afc5-a00be32d15d8/postal-address-library/1.0.4/postal-address-library.raml
+  modified: /exchange_modules/5dfb47dc-12e3-4cac-afc5-a00be32d15d8/modified-by-library/1.0.5/modified-by-library.raml
+  # collectionRT: /exchange_modules/5dfb47dc-12e3-4cac-afc5-a00be32d15d8/collection-library/1.0.27/collection-library.raml
+
+types:
+  OpportunityLineItem: 
+    description: Products attached to the sales opportunity
+    properties: 
+      opportunityLine: 
+        type: number
+        example: 1
+      productCode:
+        type: string
+        example: ERT150
+      quantity:
+        type: number
+        example: 25
+      pricing:
+        properties: 
+          itemAmount: number
+          discountPct?: number
+          totalAmount: number 
+    example:
+      opportunityLine: 1
+      productCode: ERT150
+      quantity: 23
+      pricing:
+        itemAmount: 235.0
+        totalAmount: 1056.0
+  SalesOpportunity: 
+    description: Salesforce Opportunity Object
+    type: object
+    properties: 
+      Id:
+        type: string
+        example: "xxxxxx"
+      CustomerID:
+        type: string
+        example: "xxxxxx"
+      OpportunityLineItems:
+        type: array
+        items: OpportunityLineItem
+      contact?:
+        properties:
+          firstName?:
+            example: Matias
+          lastName?: 
+            example: Juan
+          email?:
+            example: mjuan@example.com
+          phone?: 
+            example: 555-5555
+      deliveryAddress?: address.Address
+      subTotal?: number
+      shippingCost?: number
+      taxAmount?: number
+      totalAmount?: number
+      created?: modified.modified
+      sourceSystem?: 
+    example: 
+      Id: "xxxxxx"
+      CustomerID: "xxxxxx"
+      OpportunityLineItems: 
+        - opportunityLine: 1
+          productCode: ERT150
+          quantity: 23
+          pricing:
+            itemAmount: 235
+            totalAmount: 5405
+        - opportunityLine: 2
+          productCode: WTF500
+          quantity: 2
+          pricing:
+            itemAmount: 100
+            totalAmount: 200
+      contact:
+        firstName: Matias
+        lastName: Juan
+        email: brett@example.com
+        phone: 54-11-555-4432
+      # deliveryAddress: 
+      subTotal: 23
+      shippingCost: 105.5
+      taxAmount: 0.0
+      totalAmount: 255.45
+      created: 
+        byUserId: mjuan
+        onDateTime: 2018-08-18T12:13:15Z
+      sourceSystem: SFDC
+          
+  SalesOrderCreationStatus:
+    type: string
+    enum: [Error, Rejected, Created]
+
+  SalesOrderResponse:
+    type: object
+    properties:
+      metadata:
+        properties: 
+          creationResult:
+            type: SalesOrderCreationStatus
+          message:
+            type: string
+            example: "all good"
+      response:
+        properties:
+          OrderId:
+            type: string
+            example: "xx-0012-ss"
+          CustomerId:
+            type: string
+            example: "xxxxx"
+          OpportunityId:
+            type: string
+            example: "xxxxx"
+    example:
+      metadata:
+        creationResult: Created
+        message: All Good
+      response: 
+        OrderId: xx-0012-ss
+        CustomerId: A50440444
+        OpportunityId: 12321ji123jk123jk123
