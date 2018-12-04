@@ -1,20 +1,17 @@
-http:
-  port: "8081"
+https:
+  port:
 
 orderfulfillment-api:
   host: 
   basePath: 
   port: 
-  protocol: 
+  protocol:  
+  
+app:
+  autodiscovery:
   client_id: 
   client_secret: 
   
-api:
-  id: 
-  
-anypoint:
-  platform:
-    client_id: 
-    client_secret:  
-    visualizer:
-      layer: "Experience"
+keystore:
+	path:
+	password:
